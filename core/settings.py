@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'apps.dyn_datatables',
+    'apps.ecommerce',
 ]
 
 MIDDLEWARE = [
@@ -206,3 +207,5 @@ DYNAMIC_DATATB = {
     # Register models below
     'books': "Book",     
 }
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", None)
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", None)
