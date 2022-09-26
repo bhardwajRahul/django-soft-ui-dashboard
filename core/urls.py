@@ -12,8 +12,8 @@ urlpatterns = [
 
     # ADD NEW Routes HERE
     path("api/",       include("apps.api.urls")),            # API Generator Routes
-    path('',           include('apps.dyn_datatables.urls')),  # Dynamic DB Routes
     path('ecommerce/', include('apps.ecommerce.urls')),  # E-Commerce Routes
+    path('',           include('apps.dyn_datatables.urls')),  # Dynamic DB Routes
 
     # Leave `Home.Urls` as last the last line
     path("",           include("apps.home.urls"))  # Generic Routing
