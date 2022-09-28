@@ -1,3 +1,4 @@
+import json
 from http import HTTPStatus
 
 import stripe
@@ -16,20 +17,24 @@ class ProductsView(views.View):
 
     def get(self, request):
         form = ProductForm()
-        return render(request, "", context={
-            "form": form
+        products = Products.objects.all()
+        return render(request, "products/datatable.html", context={
+            "form": form,
+            "products": products
         })
 
     def post(self, request):
         product = ProductForm(request.POST)
         if not product.is_valid():
-            return JsonResponse(data={
+            return HttpResponse(json.dumps({
                 "detail": ""
-            }, status=HTTPStatus.BAD_REQUEST)
+            }), status=HTTPStatus.BAD_REQUEST)
         product.save()
-        return JsonResponse(data={
-            "detail": ""
-        }, status=HTTPStatus.OK)
+        products = Products.objects.all()
+        return render(request, "", context={
+            "form": product,
+            "products": products
+        })
 
     def put(self, request, product_id):
         try:
