@@ -156,62 +156,68 @@
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form id="form" method="post">{% csrf_token %}
+      <form id="create-form" method="post">{% csrf_token %}
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Add</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-          <div class="modal-body">
+           <div class="modal-body">
 
               <label>Name</label>
               <div class="mb-3">
-                {{ form.name }}
+                <input name="name" class="form-control" id="name"/>
               </div>
               <span class="text-danger">{{ form.name.errors }}</span>
 
               <label>Price</label>
               <div class="mb-3">
-                {{ form.price }}
+                <input name="price" class="form-control" id="price"/>
               </div>
               <span class="text-danger">{{ form.price.errors }}</span>
 
               <label>Currency</label>
               <div class="mb-3">
-                {{ form.currency }}
+                <select name="currency" class="form-control" id="currency">
+                  <option value="USD" selected="">USA Dollar</option>
+                </select>
               </div>
               <span class="text-danger">{{ form.currency.errors }}</span>
 
               <label>Payment</label>
               <div class="mb-3">
-                {{ form.payment }}
+                <select name="payment" class="form-control" id="payment">
+                  <option value="0" selected="">One Time</option>
+                  <option value="1">Monthly Frequency</option>
+                </select>
               </div>
               <span class="text-danger">{{ form.payment.errors }}</span>
 
               <label>Stripe Product Id</label>
               <div class="mb-3">
-                {{ form.stripe_product_id }}
+                <input name="stripe_product_id" class="form-control" id="stripe_product_id"/>
               </div>
-              <span class="text-danger">{{ form.stripe_product_id.errors }}</span>
+              <span class="text-danger">{{ form.strip_product_id.errors }}</span>
 
               <label>Stripe Price Id</label>
               <div class="mb-3">
-                {{ form.stripe_price_id }}
+                <input name="stripe_price_id" class="form-control" id="stripe_price_id"/>
               </div>
               <span class="text-danger">{{ form.stripe_price_id.errors }}</span>
 
               <label>Info</label>
               <div class="mb-3">
-                {{ form.info }}
+                <textarea name="info" cols="40" rows="10" class="form-control" required="" id="info"></textarea>
               </div>
               <span class="text-danger">{{ form.info.errors }}</span>
 
               <label>Full Description</label>
               <div class="mb-3">
-                {{ form.full_description }}
+                <textarea name="full_description" cols="40" rows="10" class="form-control" required="" id="full_description"></textarea>
               </div>
               <span class="text-danger">{{ form.full_description.errors }}</span>
         </div>
 
+          <p class="text-danger" id="create-error"></p>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -227,7 +233,7 @@
     <div class="modal-content">
       <form id="delete-form">{% csrf_token %}
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
           <div class="modal-body">
@@ -256,6 +262,8 @@
                 'currency': '{{ product.currency }}' ,
                 'payment': '{{ product.payment }}' ,
                 'price': '{{ product.price }}' ,
+                'stripe_product_id': '{{ product.stripe_product_id }}' ,
+                'stripe_price_id': '{{ product.stripe_price_id }}' ,
                 'info': '{{ product.info }}' ,
                 'full_description': '{{ product.full_description }}' },
             {% endfor %}
@@ -306,17 +314,23 @@
         document.getElementById('update-form').onsubmit = (e) => {
             e.preventDefault()
             const formData = new FormData(e.target)
-
-            fetch(`/ecommerce/products/${editId}/`,{
+            const data = []
+            formData.forEach((value , key) => {
+                data[key] = value
+            })
+            fetch(`/ecommerce/products/${editId}/`, {
                 method: 'PUT',
-                body: formData,
-                headers: {"X-CSRFToken": formData.get("csrfmiddlewaretoken")}
+                body: JSON.stringify(data),
+                headers: {
+                    "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+                    "Content-Type": 'application/json'
+                }
             })
                 .then((response) => {
                     if(!response.ok)
                         return response.text().then(text => { throw new Error(text) })
                     else
-                        return response.json()
+                        return response.text()
                 })
                 .then((res) => {
                     console.log(res)

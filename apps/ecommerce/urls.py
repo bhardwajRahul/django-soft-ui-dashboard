@@ -11,6 +11,7 @@ from apps.ecommerce.views import (
 
 urlpatterns = [
     path("products/", ProductsView.as_view()),
+    path("products/<int:product_id>/", ProductsView.as_view()),
     path("sales/", SalesView.as_view()),
     path("purchase/", purchase),
     path("config/", stripe_config),
