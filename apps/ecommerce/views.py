@@ -24,18 +24,16 @@ class SalesView(views.View):
     def put(self, request, sale_id):
         try:
             sale = Sales.objects.get(id=sale_id)
-        except Products.DoesNotExist:
+        except Sales.DoesNotExist:
             return JsonResponse(data={
-                "message": ""
+                "message": "Sale not found."
             }, status=HTTPStatus.NOT_FOUND)
         product_form = ProductForm(request.PUT, instance=sale)
         if not product_form.is_valid():
             return JsonResponse(data={
-                "detail": ""
+                "detail": product_form.errors
             }, status=HTTPStatus.BAD_REQUEST)
-        return JsonResponse(data={
-            "detail": ""
-        }, status=HTTPStatus.OK)
+        return JsonResponse(data={}, status=HTTPStatus.OK)
 
 
 class ProductsView(views.View):
@@ -49,15 +47,15 @@ class ProductsView(views.View):
         })
 
     def post(self, request):
-        product = ProductForm(request.POST)
-        if not product.is_valid():
-            return HttpResponse(json.dumps({
-                "detail": ""
-            }), status=HTTPStatus.BAD_REQUEST)
-        product.save()
+        product_form = ProductForm(request.POST)
+        if not product_form.is_valid():
+            return JsonResponse(data={
+                "detail": product_form.errors
+            }, status=HTTPStatus.BAD_REQUEST)
+        product_form.save()
         products = Products.objects.all()
         return render(request, "products/datatable.html", context={
-            "form": product,
+            "form": ProductForm(),
             "products": products
         })
 
@@ -66,29 +64,25 @@ class ProductsView(views.View):
             product = Products.objects.get(id=product_id)
         except Products.DoesNotExist:
             return JsonResponse(data={
-                "message": ""
+                "message": "Product not found"
             }, status=HTTPStatus.NOT_FOUND)
         data = json.loads(request.body)
         product_form = ProductForm(data, instance=product)
         if not product_form.is_valid():
             return JsonResponse(data={
-                "detail": ""
+                "detail": product_form.errors
             }, status=HTTPStatus.BAD_REQUEST)
         product_form.save()
-        return JsonResponse(data={
-            "detail": ""
-        }, status=HTTPStatus.OK)
+        return JsonResponse(data={}, status=HTTPStatus.OK)
 
     def delete(self, request, product_id):
         to_delete_product = Products.objects.filter(id=product_id)
         if to_delete_product.count() == 0:
             return JsonResponse(data={
-                "detail": ""
+                "detail": "Product not found"
             }, status=HTTPStatus.NOT_FOUND)
         to_delete_product.delete()
-        return JsonResponse(data={
-            "detail": ""
-        }, status=HTTPStatus.OK)
+        return JsonResponse(data={}, status=HTTPStatus.OK)
 
 
 def purchase(request):
@@ -142,7 +136,7 @@ def success(request):
             continue
         sale = Sales.objects.create(
             product=product,
-            value=product.price*line_item.quantity,
+            value=product.price * line_item.quantity,
             fees=product.price,
             quantity=line_item.quantity,
             client=request.user
@@ -152,6 +146,7 @@ def success(request):
 
 def cancelled(request):
     return render(request, "ecommerce/cancelled.html")
+
 
 @csrf_exempt
 def stripe_webhook(request):
@@ -166,13 +161,10 @@ def stripe_webhook(request):
             payload, sig_header, endpoint_secret
         )
     except ValueError as e:
-        # Invalid payload
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
         return HttpResponse(status=400)
 
-    # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed':
         print("Payment was successful.")
         # TODO: run some custom code here
