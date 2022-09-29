@@ -10,7 +10,32 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from apps.ecommerce.forms import ProductForm
-from apps.ecommerce.models import Products
+from apps.ecommerce.models import Products, Sales
+
+
+class SalesView(views.View):
+
+    def get(self, request):
+        sales = Sales.objects.all()
+        return render(request, "sales/datatable.html", context={
+            "sales": sales
+        })
+
+    def put(self, request, sale_id):
+        try:
+            sale = Sales.objects.get(id=sale_id)
+        except Products.DoesNotExist:
+            return JsonResponse(data={
+                "message": ""
+            }, status=HTTPStatus.NOT_FOUND)
+        product_form = ProductForm(request.PUT, instance=sale)
+        if not product_form.is_valid():
+            return JsonResponse(data={
+                "detail": ""
+            }, status=HTTPStatus.BAD_REQUEST)
+        return JsonResponse(data={
+            "detail": ""
+        }, status=HTTPStatus.OK)
 
 
 class ProductsView(views.View):

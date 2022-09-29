@@ -6,11 +6,12 @@ from apps.ecommerce.views import (
     create_checkout_session,
     success,
     cancelled,
-    stripe_webhook
+    stripe_webhook, SalesView
 )
 
 urlpatterns = [
     path("products/", ProductsView.as_view()),
+    path("sales/", SalesView.as_view()),
     path("purchase/", purchase),
     path("config/", stripe_config),
     path("create-checkout-session/", create_checkout_session),
