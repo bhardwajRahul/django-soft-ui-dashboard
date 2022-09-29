@@ -115,6 +115,18 @@
               </div>
               <span class="text-danger">{{ form.payment.errors }}</span>
 
+              <label>Stripe Product Id</label>
+              <div class="mb-3">
+                <input name="stripe_product_id" class="form-control" id="stripe_product_id"/>
+              </div>
+              <span class="text-danger">{{ form.strip_product_id.errors }}</span>
+
+              <label>Stripe Price Id</label>
+              <div class="mb-3">
+                <input name="stripe_price_id" class="form-control" id="stripe_price_id"/>
+              </div>
+              <span class="text-danger">{{ form.stripe_price_id.errors }}</span>
+
               <label>Info</label>
               <div class="mb-3">
                 <textarea name="info" cols="40" rows="10" class="form-control" required="" id="info"></textarea>
