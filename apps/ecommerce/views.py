@@ -56,7 +56,7 @@ class ProductsView(views.View):
             }), status=HTTPStatus.BAD_REQUEST)
         product.save()
         products = Products.objects.all()
-        return render(request, "", context={
+        return render(request, "products/datatable.html", context={
             "form": product,
             "products": products
         })
