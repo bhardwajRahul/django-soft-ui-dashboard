@@ -13,6 +13,7 @@ urlpatterns = [
     path("products/", ProductsView.as_view()),
     path("products/<int:product_id>/", ProductsView.as_view()),
     path("sales/", SalesView.as_view()),
+    path("sales/<int:product_id>/", SalesView.as_view()),
     path("purchase/", purchase),
     path("config/", stripe_config),
     path("create-checkout-session/", create_checkout_session),
