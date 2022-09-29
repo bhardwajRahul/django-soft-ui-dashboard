@@ -68,7 +68,7 @@ class ProductsView(views.View):
             return JsonResponse(data={
                 "message": ""
             }, status=HTTPStatus.NOT_FOUND)
-        product_form = ProductForm(request.PUT, instance=product)
+        product_form = ProductForm(json.loads(request.body), instance=product)
         if not product_form.is_valid():
             return JsonResponse(data={
                 "detail": ""
