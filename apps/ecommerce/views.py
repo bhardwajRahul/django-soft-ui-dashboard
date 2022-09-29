@@ -68,11 +68,13 @@ class ProductsView(views.View):
             return JsonResponse(data={
                 "message": ""
             }, status=HTTPStatus.NOT_FOUND)
-        product_form = ProductForm(json.loads(request.body), instance=product)
+        data = json.loads(request.body)
+        product_form = ProductForm(data, instance=product)
         if not product_form.is_valid():
             return JsonResponse(data={
                 "detail": ""
             }, status=HTTPStatus.BAD_REQUEST)
+        product_form.save()
         return JsonResponse(data={
             "detail": ""
         }, status=HTTPStatus.OK)
