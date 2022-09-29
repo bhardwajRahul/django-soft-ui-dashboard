@@ -29,6 +29,8 @@
                               <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">Price</th>
                                 <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">Currency</th>
                                 <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">Payment</th>
+                                <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">Stripe Product Id</th>
+                                <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">Stripe Price Id</th>
                                 <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">Info</th>
                                 <th class="text-center text-secondary text-xxs font-weight-bolder opacity-7">Full Description</th>
                                 <th class="text-secondary opacity-7"></th>
@@ -42,6 +44,8 @@
                               <td class="text-center"> {{ product.price }} </td>
                               <td class="text-center"> {{ product.currency }} </td>
                               <td class="text-center"> {{ product.payment }} </td>
+                              <td class="text-center"> {{ product.stripe_product_id }} </td>
+                              <td class="text-center"> {{ product.stripe_price_id }} </td>
                               <td class="text-center"> {{ product.info }} </td>
                               <td class="text-center"> {{ product.full_description }} </td>
                               <td class="align-middle">
@@ -170,6 +174,18 @@
                 {{ form.payment }}
               </div>
               <span class="text-danger">{{ form.payment.errors }}</span>
+
+              <label>Stripe Product Id</label>
+              <div class="mb-3">
+                {{ form.stripe_product_id }}
+              </div>
+              <span class="text-danger">{{ form.stripe_product_id.errors }}</span>
+
+              <label>Stripe Price Id</label>
+              <div class="mb-3">
+                {{ form.stripe_price_id }}
+              </div>
+              <span class="text-danger">{{ form.stripe_price_id.errors }}</span>
 
               <label>Info</label>
               <div class="mb-3">
