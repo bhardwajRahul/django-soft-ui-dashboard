@@ -45,46 +45,40 @@
       </div>
           <div class="modal-body">
 
-              <label>Name</label>
+              <label>Product</label>
               <div class="mb-3">
-                <input name="name" class="form-control" id="name"/>
+                <input name="product" class="form-control" id="product"/>
               </div>
-              <span class="text-danger">{{ form.name.errors }}</span>
 
-              <label>Price</label>
+              <label>Value</label>
               <div class="mb-3">
-                <input name="price" class="form-control" id="price"/>
+                <input name="value" class="form-control" id="value"/>
               </div>
-              <span class="text-danger">{{ form.price.errors }}</span>
 
-              <label>Currency</label>
+              <label>Fees</label>
               <div class="mb-3">
-                <select name="currency" class="form-control" id="currency">
-                  <option value="USD" selected="">USA Dollar</option>
-                </select>
+                  <input name="fees" class="form-control" id="fees"/>
               </div>
-              <span class="text-danger">{{ form.currency.errors }}</span>
 
-              <label>Payment</label>
+              <label>Quantity</label>
               <div class="mb-3">
-                <select name="payment" class="form-control" id="payment">
-                  <option value="0" selected="">One Time</option>
-                  <option value="1">Monthly Frequency</option>
-                </select>
+                <input name="quantity" class="form-control" id="quantity"/>
               </div>
-              <span class="text-danger">{{ form.payment.errors }}</span>
 
-              <label>Info</label>
+              <label>Timestamp</label>
               <div class="mb-3">
-                <textarea name="info" cols="40" rows="10" class="form-control" required="" id="info"></textarea>
+                  <input name="timestamp" class="form-control" id="timestamp"/>
               </div>
-              <span class="text-danger">{{ form.info.errors }}</span>
 
-              <label>Full Description</label>
+              <label>Client</label>
               <div class="mb-3">
-                <textarea name="full_description" cols="40" rows="10" class="form-control" required="" id="full_description"></textarea>
+                  <input name="client" class="form-control" id="client"/>
               </div>
-              <span class="text-danger">{{ form.full_description.errors }}</span>
+
+              <label>Note</label>
+              <div class="mb-3">
+                   <textarea name="note" cols="40" rows="10" class="form-control" required="" id="note"></textarea>
+              </div>
         </div>
 
        <p class="text-danger" id="edit-error"></p>
@@ -99,28 +93,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form id="delete-form">{% csrf_token %}
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-          <div class="modal-body">
-              <p>Are you sure?</p>
-              <p class="text-danger" id="delete-error"></p>
-          </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <input type="submit" class="btn btn-primary" value="Confirm">
-      </div>
-    </form>
-    </div>
-  </div>
-</div>
-
 {% endblock content %}
 
 {% block javascripts %}
@@ -129,35 +101,32 @@
         const data = [
             {% for sale in sales %}
                 {'id': '{{ sale.id }}',
-                'product': '{{ sale.product }}',
+                'product': '{{ sale.product.name }}',
                 'value': '{{ sale.value }}' ,
                 'fees': '{{ sale.fees }}' ,
                 'quantity': '{{ sale.quantity }}' ,
                 'timestamp': '{{ sale.timestamp }}' ,
-                'client': '{{ sale.client }}' },
+                'client': '{{ sale.client }}' ,
                 'note': '{{ sale.note }}' },
             {% endfor %}
         ]
 
-        const myData  = data.map((d) => Object.keys(d).map((key) => d[key]))
-        const heading = Object.keys(data)
-
+        let myData  = data.map((d) => Object.keys(d).map((key) => d[key]))
+        const heading = Object.keys(data[0])
+        myData = myData.map((d) => [...d,`
+        <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+            <i id="edit-item" data-bs-toggle="modal" data-bs-target="#updateModal"
+               data-product-id="${ d[0] }" class="fa fa-edit"></i>
+        </a>
+        `])
         // table
-        const dataTable = new simpleDatatables.DataTable('table' , {
-            data: {
-                heading: heading,
-                data: myData
-            },
-            perPageSelect: [10,25,50],
-            perPage: parseInt(new URLSearchParams(window.location.search).get('entries')) || 10,
-            labels: {
-                placeholder: "Search...",
-                perPage: "{select} entries per page",
-                noRows: "No entries to found",
-                info: "Showing {start} to {end} of {rows} entries",
-            },
-            searchable: false,
-        })
+        const dataTable = new simpleDatatables.DataTable(".table",{data:
+        {
+            headings: [...heading,''],
+            data: myData,
+        }
+    });
+
 
         let deleteId = ''
         let editId = ''
