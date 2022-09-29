@@ -102,18 +102,18 @@ def stripe_config(request):
 @csrf_exempt
 def create_checkout_session(request):
     if request.method == 'GET':
-        domain_url = 'http://localhost:8000'
-        stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
-            # Create new Checkout Session for the order
-            # Other optional params include:
-            # [billing_address_collection] - to display billing address details on the page
-            # [customer] - if you have an existing Stripe Customer ID
-            # [payment_intent_data] - capture the payment later
-            # [customer_email] - prefill the email input in the form
-            # For full details see https://stripe.com/docs/api/checkout/sessions/create
+            product_pk = request.GET.get('product')
+            if not product_pk:
+                raise Exception("product id not provided.")
+            product = Products.objects.get(pk=product_pk)
+            quantity = request.GET.get("quantity", 1)
+            domain_url = 'http://localhost:8000'
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
 
-            # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+        try:
             checkout_session = stripe.checkout.Session.create(
                 success_url=domain_url + f'{reverse("stripe-success")}?session_id={{CHECKOUT_SESSION_ID}}',
                 cancel_url=domain_url + reverse("stripe-cancelled"),
@@ -121,8 +121,8 @@ def create_checkout_session(request):
                 mode='payment',
                 line_items=[
                     {
-                        "price": "price_1LmFBgLz9Qh03BqlqfT2Kgc6",
-                        "quantity": 2
+                        "price": product.stripe_price_id,
+                        "quantity": quantity
                     }
                 ]
             )
@@ -132,6 +132,19 @@ def create_checkout_session(request):
 
 
 def success(request):
+    session_id = request.GET.get("session_id")
+    session = stripe.checkout.Session.list_line_items(session_id)
+    for line_item in session.data:
+        product = Products.objects.filter(stripe_product_id=line_item.price.product).first()
+        if product is None:
+            continue
+        sale = Sales.objects.create(
+            product=product,
+            value=product.price*line_item.quantity,
+            fees=product.price,
+            quantity=line_item.quantity,
+            client=request.user
+        )
     return render(request, "ecommerce/success.html")
 
 

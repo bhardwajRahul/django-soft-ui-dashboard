@@ -238,9 +238,10 @@
         document.getElementById('products-table').onclick = (e) => {
             if (e.target.id === 'delete-item')
                  deleteId = e.target.getAttribute("data-product-id")
-            else if (e.target.id === 'edit-item')
-                 editId = e.target.getAttribute("data-product-id")
+            else if (e.target.id === 'edit-item') {
+                editId = e.target.getAttribute("data-product-id")
                 setEditFormValues(editId)
+            }
         }
 
         const setEditFormValues = (id) => {

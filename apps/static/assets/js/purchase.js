@@ -7,7 +7,7 @@ fetch("/ecommerce/config/")
   const stripe = Stripe(data.publicKey);
   document.querySelector("#submitBtn").addEventListener("click", () => {
     // Get Checkout Session ID
-    fetch("/ecommerce/create-checkout-session/")
+    fetch("/ecommerce/create-checkout-session/?product=1&quantity=2")
     .then((result) => {
       return result.json();
     })
