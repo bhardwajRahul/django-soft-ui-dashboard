@@ -13,7 +13,7 @@ from apps.ecommerce.forms import ProductForm, SaleForm
 from apps.ecommerce.models import Products, Sales
 
 
-class SalesView(views.View):
+class AdminSalesView(views.View):
 
     def get(self, request):
         sales = Sales.objects.all()
@@ -38,9 +38,13 @@ class SalesView(views.View):
         return JsonResponse(data={}, status=HTTPStatus.OK)
 
 
-class ProductsView(views.View):
+class AdminProductsView(views.View):
 
-    def get(self, request):
+    def get(self, request, product_id=None):
+        if product_id:
+            return render(request, "", context={
+                "product": Products.objects.get(id=product_id),
+            })
         form = ProductForm()
         products = Products.objects.all()
         return render(request, "products/datatable.html", context={
@@ -172,3 +176,17 @@ def stripe_webhook(request):
         # TODO: run some custom code here
 
     return HttpResponse(status=200)
+
+
+class ProductsView(views.View):
+
+    def get(self, request, product_id=None):
+        if product_id:
+            return render(request, "", context={
+                "product": Products.objects.get(id=product_id),
+            })
+        products = Products.objects.all()
+        return render(request, "", context={
+            "products": products
+        })
+
