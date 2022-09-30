@@ -148,11 +148,17 @@
         document.getElementById('update-form').onsubmit = (e) => {
             e.preventDefault()
             const formData = new FormData(e.target)
-
+            const data = {}
+            formData.forEach((value , key) => {
+                data[key] = value
+            })
             fetch(`/ecommerce/products/${editId}/`,{
                 method: 'PUT',
-                body: formData,
-                headers: {"X-CSRFToken": formData.get("csrfmiddlewaretoken")}
+                body: JSON.stringify(data),
+                headers: {
+                    "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+                    "Content-Type": 'application/json'
+                }
             })
                 .then((response) => {
                     if(!response.ok)
