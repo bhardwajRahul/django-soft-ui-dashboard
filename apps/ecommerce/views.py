@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from apps.ecommerce.forms import ProductForm
+from apps.ecommerce.forms import ProductForm, SaleForm
 from apps.ecommerce.models import Products, Sales
 
 
@@ -28,11 +28,13 @@ class SalesView(views.View):
             return JsonResponse(data={
                 "message": "Sale not found."
             }, status=HTTPStatus.NOT_FOUND)
-        product_form = ProductForm(request.PUT, instance=sale)
-        if not product_form.is_valid():
+        data = json.loads(request.body)
+        sales_form = SaleForm(data, instance=sale)
+        if not sales_form.is_valid():
             return JsonResponse(data={
-                "detail": product_form.errors
+                "detail": sales_form.errors
             }, status=HTTPStatus.BAD_REQUEST)
+        sales_form.save()
         return JsonResponse(data={}, status=HTTPStatus.OK)
 
 
